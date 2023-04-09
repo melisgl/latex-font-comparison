@@ -1,0 +1,346 @@
+\documentclass[12pt,a4paper,oneside]{book}
+
+\usepackage[inner=40mm,outer=30mm,top=15mm,bottom=10mm,
+  headheight=15mm,marginparwidth=20mm]{geometry}
+
+\ifpdftex
+  \usepackage[spacing=true]{microtype}
+\else
+  \usepackage{microtype}
+\fi
+
+\usepackage{xfp}
+\usepackage{calc}
+\usepackage{scalefnt}
+\usepackage{blindtext}
+\usepackage{setspace}
+
+%% \let\danger\relax
+%% \usepackage{stix2}
+%% \let\danger\relax
+%% \let\mathbf\relax
+%% \let\mathit\relax
+%% \let\mathsf\relax
+%% \let\mathtt\relax
+%% \usepackage{ETbb}
+\let\textfrac\relax
+\let\textlf\relax
+\let\textosf\relax
+\let\Qswash\relax
+\let\Qnoswash\relax
+%% \usepackage{fbb}
+%% \let\textlf\relax
+\let\textosf\relax
+\let\Qswash\relax
+\let\Qnoswash\relax
+\usepackage{lmodern}
+\usepackage{libertinus}
+\usepackage{ebgaramond}
+%% \usepackage{garamondx}
+\let\textfrac\relax
+%% \usepackage{XCharter}
+%% \usepackage{tinos}
+%% \usepackage{merriweather}
+%% \usepackage{sourceserifpro}
+%% \usepackage{bookman}
+%% \usepackage{palatino}
+\let\textfrac\relax
+%% \usepackage{erewhon}
+\let\thdefault\relax
+%% \usepackage{tgtermes}
+%% \usepackage{tgpagella}
+\let\textfrac\relax
+\let\thdefault\relax
+\usepackage{newpxtext}
+\let\thdefault\relax
+%% \usepackage{tgbonum}
+%% \usepackage{fouriernc}
+%% \usepackage{tgschola}
+%% \usepackage{Baskervaldx}
+%% \usepackage{Alegreya}
+%% \usepackage{gentiumbook}
+%% \usepackage{librebaskerville}
+%% \let\textfrac\relax
+%% \usepackage{cochineal}
+%% \usepackage{CrimsonPro}
+%% \usepackage{crimson}
+%% \usepackage{DejaVuSerif}
+%% \usepackage{fourier}
+%% \usepackage{linguisticspro}
+%% \usepackage[t,lf]{spectral}
+%% \usepackage{plex-serif}
+%% \usepackage{droidserif}
+%% \usepackage{noto-serif}
+
+%% \hyphenpenalty=10000
+%% \exhyphenpenalty=10000
+%% \raggedright
+
+\RequirePackage{expl3}
+\ExplSyntaxOn
+\cs_new_eq:NN \fptodim \fp_to_dim:n
+\ExplSyntaxOff
+
+%% 3.3333ex is 1.5 with Times New Roman.
+\newlength{\hhh}
+\newlength{\lll}
+\newcommand{\setlll}{%
+  \setlength{\hhh}{\heightof{f}}
+  \setlength{\lll}%
+            {3.3333ex}}
+%%             {\fptodim{(1ex*(1-0.41443387) + \hhh*0.41443387)*2.7548947}}}
+
+\makeatletter
+%http://groups.google.com/group/comp.text.tex/msg/7e812e5d6e67fcc5
+\def\convertto#1#2{\strip@pt\dimexpr #2*65536/\number\dimexpr 1#1}
+\newcommand{\texfontsize}{\f@size pt}
+\makeatother\makeatother
+
+\newcommand{\reftext}{\dummy}
+
+\newlength{\refwidth}
+\newlength{\refskip}
+\newlength{\refex}
+
+\newlength{\adjustedfontsize}
+\newlength{\adjustedskip}
+\newlength{\thiswidth}
+\newlength{\thisskip}
+\newlength{\thisex}
+
+\newcommand{\normalizefontsizebyspace}{%
+  \setlength{\thiswidth}{\widthof{\reftext}}%
+  \setlength{\thisskip}{\baselineskip}
+%%   Bem: \convertto{pt}{1em}pt,
+%%   Bskip: \the\baselineskip,
+%%   Bstretch: \baselinestretch,
+%%   refwidth: \the\refwidth,
+%%   thiswidth: \the\thiswidth,
+%%   refskip: \the\refskip,
+%%   thisskip: \the\thisskip\\
+%%   fp: \fpeval{sqrt(\refwidth / \thiswidth * \refskip / \thisskip)}
+  \setlength{\adjustedfontsize}%
+            {1em *
+              \real{\fpeval{sqrt((\refwidth / \thiswidth) * (\refskip / \thisskip))}}}
+  \setlength{\adjustedskip}%
+            {\baselineskip
+              / \real{\baselinestretch}
+              * \real{\fpeval{sqrt((\refwidth / \thiswidth) * (\refskip / \thisskip))}}}
+  \fontsize{\adjustedfontsize}{\adjustedskip}\selectfont
+%%   \\adjustedfontsize: \the\adjustedfontsize,
+%%    Aem: \convertto{pt}{1em}pt,
+%%   adjustedskip: \the\adjustedskip,
+%%   Askip: \the\baselineskip,
+%%   Astretch: \baselinestretch
+}
+
+\newcommand{\normalizefontsizebyxheight}[1][1ex]{%
+  \setlength{\thisex}{#1}
+  \setlength{\adjustedfontsize}%
+            {1em * \real{\fpeval{\refex / \thisex}}}
+  \setlength{\adjustedskip}%
+            {\baselineskip
+              / \real{\baselinestretch}
+              * \real{\fpeval{\refex / \thisex}}}
+  \fontsize{\adjustedfontsize}{\adjustedskip}\selectfont
+}
+
+\newlength{\xxxex}
+\newlength{\xxxwidth}
+\newcommand{\describespacing}[2][1ex]{%
+  \textbf{#2},
+  \setlength{\xxxex}{#1}%
+  \setlength{\xxxwidth}{\widthof{\reftext}}%
+  relex: \textbf{\fpeval{round(\xxxex / \refex, 3)}},
+  relwidth: \textbf{\fpeval{round(\xxxwidth / \refwidth, 3)}},
+  tex font size: \texfontsize,
+  em: \convertto{pt}{1em}pt,
+  ex: \convertto{pt}{1ex}pt,
+  ex/em: \convertto{em}{1ex},
+  skip: \the\baselineskip,
+  stretch: \baselinestretch,
+  \global\edef\fontonpage{#2, ex: $\times$\fpeval{round(\xxxex / \refex, 3)},
+    width: $\times$\fpeval{round(\xxxwidth / \refwidth, 3)}}%
+  \par
+  \noindent\specimen}
+\newcommand{\specimenone}{%
+  \noindent abcdefghijklmnopqrtsuvwxyz ABCDEFGHIJKLMNOPQRTSUVWXYZ\\
+  0123456789 \!\@\#\$\%\& ()[]\{\}\\}
+\newcommand{\specimen}{%
+  \specimenone
+  \emph{\specimenone}
+  \textbf{\specimenone}
+  \textsc{\noindent AabcdefghijklmnopqrtsuvwxyzZ}}
+\newcommand{\dummy}{In metal typesetting, a font is a particular size, weight and style of a typeface. Each font is a matched set of type, with a piece (a "sort") for each glyph. A typeface consists various fonts that share an overall design.
+In modern usage, with the advent of computer fonts, the term "font" has come to be used as a synonym for "typeface", although a typical typeface (or "font family") consists of several fonts. For instance, the typeface "Bauer Bodoni" (sample shown here) includes fonts "Roman" (or "Regular"), "Bold" and "Italic"; each of these exists in a variety of sizes. The term "font" is correctly applied to any one of these alone but may be seen used loosely to refer to the whole typeface. When used in computers, each style is in a separate digital "font file".
+In both traditional typesetting and modern usage, the word "font" refers to the delivery mechanism of the typeface. In traditional typesetting, the font would be made from metal or wood type: to compose a page may require multiple fonts or even multiple typefaces.
+In a manual printing (letterpress) house the word "font" would refer to a complete set of metal type that would be used to typeset an entire page. Upper- and lowercase letters get their names because of which case the metal type was located in for manual typesetting: the more distant upper case or the closer lower case. The same distinction is also referred to with the terms majuscule and minuscule.
+Unlike a digital typeface, a metal font would not include a single definition of each character, but commonly used characters (such as vowels and periods) would have more physical type-pieces included. A font when bought new would often be sold as (for example in a Roman alphabet) 12pt 14A 34a, meaning that it would be a size 12-point font containing 14 uppercase "A"s, and 34 lowercase "A"s.
+The rest of the characters would be provided in quantities appropriate for the distribution of letters in that language. Some metal type characters required in typesetting, such as dashes, spaces and line-height spacers, were not part of a specific font, but were generic pieces that could be used with any font.[2] Line spacing is still often called "leading", because the strips used for line spacing were made of lead (rather than the harder alloy used for other pieces).}
+\newcommand{\tryfont}[4][1ex]{%
+  \clearpage
+  \fontfamily{#2}\selectfont\setlll\bodyleading{\lll*\ratio{#1}{1ex}}
+%%   \normalizefontsizebyspace
+  \normalizefontsizebyxheight[#1]
+  \dummy
+
+  \describespacing[#1]{#3}
+
+  {#4}}
+
+
+%%%% Measure visual x-height. How much do other lowercase letters
+%%%% overshoot x-height and go below the baseline in units of 0.01pt.
+\usepackage{xcolor}
+\newcommand{\markxheight}{%
+  \noindent\rule[1ex+0.2pt]{\textwidth}{0.01pt}\vspace{-\baselineskip}\par
+  \noindent\rule[1ex+0.1pt]{\textwidth}{0.01pt}\vspace{-\baselineskip}\par
+  \noindent\rule[1ex+0.0pt]{\textwidth}{0.01pt}\vspace{-\baselineskip}\par
+  \noindent\rule[1ex-0.1pt]{\textwidth}{0.01pt}\vspace{-\baselineskip}\par
+  \noindent\rule[1ex-0.2pt]{\textwidth}{0.01pt}\vspace{-\baselineskip}\par
+  \noindent{\color{red}\rule[0pt]{\textwidth}{0.02pt}} \vspace{-2\baselineskip}\par
+  {\color{green}\noindent\rule[\heightof{o}]{\textwidth}{0.01pt}}\vspace{-\baselineskip}\par
+  {\color{green}\noindent\rule[0pt-\depthof{o}]{\textwidth}{0.01pt}}\vspace{-\baselineskip}\par
+%%   \noindent{\color{red}\rule[5.4pt]{\textwidth}{0.01pt}} \vspace{-2\baselineskip}\par
+%%   \noindent\rule[-0.1pt]{\textwidth}{0.01pt}\vspace{-\baselineskip}\par
+%%   \noindent{\color{red}\rule[-17.982pt]{\textwidth}{0.01pt}} \vspace{-2\baselineskip}\par
+}
+
+%              | overshoot   |                | correction
+% latin modern | 1.5         | at ex=5.1666pt | 1.0029032
+% times        | 1+1         | at ex=5.4929pt | 1.0018206
+% libertinus   | 1+1         | at ex=5.3158pt | 1.0018812
+% eb garamond  | 2+2         | at ex=5.3285pt | 1.0037534
+% xcharter:    | 1 (-1 - 1)  | at ex=5.4466pt |
+% source serif | 1.5 (0-1.5) | at ex=5.3440pt |
+% The corrections to x-height are very small.
+
+
+\lineskiplimit=-\maxdimen
+
+%% \usepackage{leading}
+
+%% Adapted from the leading package to support calc calculations and
+%% use setstretch.
+\makeatletter
+\newcommand\bodyleading[1]{%
+  \begingroup
+    \@tempdima=\f@baselineskip\relax
+    \setlength\@tempdimb{#1}
+    \setlength\@tempdimc{1pt*\ratio{\@tempdimb}{\@tempdima}}%
+    \global\@tempdimc=\@tempdimc
+  \endgroup
+  \setstretch{\strip@pt\@tempdimc}\ignorespaces}
+\makeatother
+
+
+\usepackage{titleps}
+\newpagestyle{newstyle}{
+  \setheadrule{.4pt}
+  \sethead[\chaptertitle]% even left
+    []% even centre
+    [\thepage]% even right
+    {\chaptertitle}% odd left
+    {\fontonpage}% odd centre
+    {\thepage}% odd right
+}
+
+\pagestyle{newstyle}
+\def\fontonpage{}
+
+\begin{document}
+
+\textbf{\large Comparing fonts at the same x-height}\\
+
+Setting the font size produces wildly different sizes for lowercase characters, line densities and space usage, so we'll do some normalization to make comparison easier.
+
+Times New Roman is our reference and it is set with 12pt and line spacing 18pt.
+For the rest of the fonts, we set the font size so that their x-height (ex) matches that of Times New Roman.
+
+\chapter{Timeslike}
+\clearpage
+
+{\fontfamily{ptm}\selectfont\setlll\bodyleading{\lll}
+  \dummy
+
+  \setlength{\global\refwidth}{\widthof{\reftext}}
+  \setlength{\global\refskip}{\baselineskip}
+  \setlength{\global\refex}{1ex}
+  \describespacing{Times New Roman}}
+\tryfont{stix}{Stix}{}
+\tryfont{qtm}{TeX Gyre Termes}{}
+\tryfont{stix2}{Stix2}{}
+\tryfont{LinuxLibertineT-OsF}{Libertinus}{}
+\tryfont{NotoSerif-OsF}{Noto Serif}{}
+
+\chapter{Schoolbook}
+\clearpage
+
+\tryfont{pnc}{New Century}{}
+\tryfont{qcs}{TeX Gyre Schola}{}
+\tryfont{cmr}{Computer Modern}{}
+\tryfont{lmr}{Latin Modern}{}
+
+\chapter{Bookman}
+\clearpage
+
+\tryfont{pbk}{Bookman}{}
+\tryfont{qbk}{TeX Gyre Bonum}{}
+
+\chapter{Baskerville}
+\clearpage
+
+\tryfont{LibreBskvl-LF}{Libre Baskerville}{}
+\tryfont{Baskervaldx-TLF}{Baskervaldx}{}
+
+\chapter{Utopia}
+\clearpage
+
+\tryfont{put}{Utopia}{}
+%% \tryfont{fut}{Fourier}{}
+\tryfont{LinguisticsPro-OsF}{Linguistics Pro}{}
+\tryfont{qpl}{Erewhon}{}
+
+\chapter{Bembo}
+\clearpage
+
+\tryfont{fbb-TLF}{fbb}{}
+\tryfont{ETbb-TLF}{ET Bembo}{}
+
+\chapter{Garamond}
+\clearpage
+
+\tryfont{zgmx}{GaramondX}{}
+\tryfont{Crimson-TLF}{Crimson (Amiri)}{}
+\tryfont{Cochineal-TLF}{Cochineal}{}
+%% X-height is farther from typical height of lowercase characters
+%% than for other fonts.
+\tryfont[1.02ex]{EBGaramond-OsF}{EB Garamond}{}
+\tryfont{CrimsonPro-OsF}{Crimson Pro}{}
+\tryfont{SourceSerifPro-OsF}{Source Serif Pro}{}
+
+\chapter{Palatino}
+\clearpage
+
+\tryfont{ppl}{mathpazo}{}
+\tryfont{zplTLF}{newpx}{}
+\tryfont{qpl}{TeX Gyre Pagella}{}
+\tryfont{jkp}{KP Serif}{}
+
+\chapter{Slab Serifs}
+\clearpage
+
+\tryfont{Merriwthr-OsF}{Merriweather}{}
+\tryfont{Tinos-TLF}{Tinos}{}
+\tryfont{XCharter-OsF}{XCharter}{}
+\tryfont{IBMPlexSerif-TLF}{IBM Plex Serif}{}
+\tryfont{DejaVuSerif-TLF}{DejaVu}{}
+
+\chapter{Funky Stuff}
+\clearpage
+
+\tryfont{Alegreya-OsF}{Alegreya}{}
+\tryfont{Spectral-OsF}{Spectral}{}
+\tryfont{gentiumbook}{Gentium Book}{}
+
+\end{document}
